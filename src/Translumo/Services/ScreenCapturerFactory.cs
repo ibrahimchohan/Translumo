@@ -19,7 +19,7 @@ namespace Translumo.Services
         public IScreenCapturer CreateCapturer(bool reliabilityPrioritize)
         {
             // The DirectX capturer only reads the primary display; a tracked window can be on any monitor.
-            if (reliabilityPrioritize || _configuration.Mode == CaptureMode.Window)
+            if (reliabilityPrioritize || _configuration.Mode == CaptureTargetMode.Window)
             {
                 return (IScreenCapturer)TryCreateCapturer<BitBltScreenCapture>() ?? TryCreateCapturer<ScreenDXCapturer>();
             }

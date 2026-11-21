@@ -29,6 +29,32 @@ namespace Translumo.Utils
         const int SWP_FRAMECHANGED = 0x0020;
         const uint WM_SETICON = 0x0080;
 
+        private const uint WDA_EXCLUDEFROMCAPTURE = 0x11;
+
+        [DllImport("user32.dll")]
+        static extern bool SetWindowDisplayAffinity(IntPtr hwnd, uint affinity);
+
+        /// <summary>
+        /// Excludes the window from screen capture (Windows 10 2004+), so OCR never reads the app's own UI.
+        /// Call after the window handle is created (SourceInitialized).
+        /// </summary>
+        public static void ExcludeFromCapture(Window window)
+        {
+            var hwnd = new WindowInteropHelper(window).Handle;
+            if (hwnd != IntPtr.Zero)
+            {
+                SetWindowDisplayAffinity(hwnd, WDA_EXCLUDEFROMCAPTURE);
+            }
+        }
+
+        /// <summary>Converts a rectangle in physical screen pixels to device-independent units of the given visual.</summary>
+        public static Rect ToDip(System.Windows.Media.Visual visual, System.Drawing.RectangleF physical)
+        {
+            var dpi = System.Windows.Media.VisualTreeHelper.GetDpi(visual);
+            return new Rect(physical.X / dpi.DpiScaleX, physical.Y / dpi.DpiScaleY,
+                physical.Width / dpi.DpiScaleX, physical.Height / dpi.DpiScaleY);
+        }
+
         public static void RemoveIcon(Window window)
         {
             // Get this window's handle

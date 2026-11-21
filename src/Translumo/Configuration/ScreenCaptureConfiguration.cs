@@ -5,7 +5,7 @@ using Translumo.Utils;
 
 namespace Translumo.Configuration
 {
-    public enum CaptureMode : byte
+    public enum CaptureTargetMode : byte
     {
         /// <summary>Fixed rectangle on the screen.</summary>
         Area = 0,
@@ -17,7 +17,7 @@ namespace Translumo.Configuration
     {
         private readonly object _areaLock = new object();
         private RectangleF _captureArea;
-        private CaptureMode _mode;
+        private CaptureTargetMode _mode;
         private string _targetProcessName;
         private string _targetWindowTitle;
         private string _targetWindowClass;
@@ -25,7 +25,7 @@ namespace Translumo.Configuration
         private volatile bool _captureSuspended;
 
         /// <summary>
-        /// Area to capture in physical screen pixels. In <see cref="CaptureMode.Window"/> mode it is kept up to date
+        /// Area to capture in physical screen pixels. In <see cref="CaptureTargetMode.Window"/> mode it is kept up to date
         /// by the window tracker. Read from the capture thread, written from the UI thread.
         /// </summary>
         public RectangleF CaptureArea
@@ -53,7 +53,7 @@ namespace Translumo.Configuration
             }
         }
 
-        public CaptureMode Mode
+        public CaptureTargetMode Mode
         {
             get => _mode;
             set => SetProperty(ref _mode, value);

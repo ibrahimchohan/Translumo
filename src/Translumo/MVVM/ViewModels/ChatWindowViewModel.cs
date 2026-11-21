@@ -9,6 +9,7 @@ using Translumo.HotKeys;
 using Translumo.Infrastructure;
 using Translumo.Infrastructure.Constants;
 using Translumo.MVVM.Models;
+using Translumo.MVVM.Views;
 using Translumo.Services;
 using Translumo.Services.Windows;
 using Translumo.Update;
@@ -60,6 +61,26 @@ namespace Translumo.MVVM.ViewModels
             hotKeysManager.WindowStyleChangeKeyPressed += HotKeysManagerOnWindowStyleChangeKeyPressed;
             chatTextMediator.TextRaised += ChatTextMediatorOnTextRaised;
             chatTextMediator.ClearTextsRaised += ChatTextMediatorOnClearTextsRaised;
+        }
+
+        public void ToggleTranslation() => HotKeysManagerOnTranslationStateKeyPressed(this, EventArgs.Empty);
+
+        public void SelectArea() => HotKeysManagerOnSelectAreaKeyPressed(this, EventArgs.Empty);
+
+        public void ToggleSettings() => OnShowHideSettings();
+
+        /// <summary>Shows or hides the chat (text) window without starting or stopping translation.</summary>
+        public void ToggleChatVisibility() => ChatWindowIsVisible = !ChatWindowIsVisible;
+
+        public void SelectWindow()
+        {
+            Model.EndTranslation();
+
+            var result = _dialogService.ShowWindowDialog<WindowPickerWindow>(out var window);
+            if (result == true && window.SelectedWindow != null)
+            {
+                _windowTracker.SetTarget(window.SelectedWindow);
+            }
         }
 
         private void HotKeysManagerOnSettingVisibilityKeyPressed(object sender, EventArgs e)

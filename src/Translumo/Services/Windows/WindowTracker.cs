@@ -75,7 +75,7 @@ namespace Translumo.Services.Windows
             Configuration.TargetWindowTitle = window.Title;
             Configuration.TargetWindowClass = window.ClassName;
             Configuration.TargetRelativeArea = RectangleF.Empty;
-            Configuration.Mode = CaptureMode.Window;
+            Configuration.Mode = CaptureTargetMode.Window;
             Update();
         }
 
@@ -85,7 +85,7 @@ namespace Translumo.Services.Windows
         /// </summary>
         public void SetSelectedArea(RectangleF screenArea)
         {
-            if (Configuration.Mode == CaptureMode.Window && State == TargetWindowState.Tracking)
+            if (Configuration.Mode == CaptureTargetMode.Window && State == TargetWindowState.Tracking)
             {
                 var windowBounds = (RectangleF)WindowEnumerator.GetBounds(Configuration.TargetHandle);
                 var inside = RectangleF.Intersect(windowBounds, screenArea);
@@ -98,7 +98,7 @@ namespace Translumo.Services.Windows
                 }
             }
 
-            Configuration.Mode = CaptureMode.Area;
+            Configuration.Mode = CaptureTargetMode.Area;
             Configuration.CaptureArea = screenArea;
             Update();
         }
@@ -128,7 +128,7 @@ namespace Translumo.Services.Windows
 
         private void Update()
         {
-            if (Configuration.Mode != CaptureMode.Window)
+            if (Configuration.Mode != CaptureTargetMode.Window)
             {
                 Configuration.CaptureSuspended = false;
                 State = TargetWindowState.AreaMode;

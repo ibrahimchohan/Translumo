@@ -156,4 +156,33 @@
     <system:String x:Key="Str.Lookupper.Url">https://cn.lookupper.com</system:String>
 
 
+
+    <system:String x:Key="Str.Bar.StartStop">开始 / 停止翻译</system:String>
+    <system:String x:Key="Str.Bar.Languages">语言（打开设置）</system:String>
+    <system:String x:Key="Str.Bar.SelectArea">选择屏幕区域</system:String>
+    <system:String x:Key="Str.Bar.SelectWindow">选择要翻译的窗口</system:String>
+    <system:String x:Key="Str.Bar.Overlay">覆盖</system:String>
+    <system:String x:Key="Str.Bar.Chat">显示 / 隐藏翻译窗口</system:String>
+    <system:String x:Key="Str.Bar.Settings">设置</system:String>
+    <system:String x:Key="Str.Bar.Exit">退出</system:String>
+    <system:String x:Key="Str.Bar.Collapse">折叠 / 展开</system:String>
+    <system:String x:Key="Str.Bar.Move">移动</system:String>
+    <system:String x:Key="Str.Region.AreaMode">屏幕区域</system:String>
+    <system:String x:Key="Str.Region.Menu">区域选项</system:String>
+    <system:String x:Key="Str.Region.NoTarget">请选择要翻译的区域或窗口。</system:String>
+    <system:String x:Key="Str.Region.NoWindow">尚未选择要翻译的窗口。</system:String>
+    <system:String x:Key="Str.Region.WindowNotOpen">要翻译的窗口 {0} 未打开，请先打开它。</system:String>
+    <system:String x:Key="Str.Region.WindowMinimized">要翻译的窗口 {0} 已最小化。</system:String>
+    <system:String x:Key="Str.Region.SelectNewWindow">选择新窗口</system:String>
+    <system:String x:Key="Str.Region.SelectArea">选择区域</system:String>
+    <system:String x:Key="Str.Region.Refresh">重新查找窗口</system:String>
+    <system:String x:Key="Str.Region.WholeWindow">使用整个窗口</system:String>
+    <system:String x:Key="Str.Region.HideFrame">隐藏边框</system:String>
+    <system:String x:Key="Str.Picker.Title">选择要翻译的窗口</system:String>
+    <system:String x:Key="Str.Picker.PickOnScreen">在屏幕上选择</system:String>
+    <system:String x:Key="Str.Picker.Refresh">刷新列表</system:String>
+    <system:String x:Key="Str.Picker.Cancel">取消</system:String>
+    <system:String x:Key="Str.Picker.Select">选择</system:String>
+    <system:String x:Key="Str.Picker.Browser">浏览器</system:String>
+    <system:String x:Key="Str.Picker.PickHint">单击要翻译的窗口。按 Esc 取消。</system:String>
 </ResourceDictionary>

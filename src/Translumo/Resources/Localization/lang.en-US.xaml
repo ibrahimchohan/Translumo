@@ -156,4 +156,33 @@
     <system:String x:Key="Str.Lookupper.Url">https://lookupper.com</system:String>
 
 
+
+    <system:String x:Key="Str.Bar.StartStop">Start / stop translation</system:String>
+    <system:String x:Key="Str.Bar.Languages">Languages (opens settings)</system:String>
+    <system:String x:Key="Str.Bar.SelectArea">Select an area on the screen</system:String>
+    <system:String x:Key="Str.Bar.SelectWindow">Select a window to translate</system:String>
+    <system:String x:Key="Str.Bar.Overlay">Overlay</system:String>
+    <system:String x:Key="Str.Bar.Chat">Show / hide the translation window</system:String>
+    <system:String x:Key="Str.Bar.Settings">Settings</system:String>
+    <system:String x:Key="Str.Bar.Exit">Exit</system:String>
+    <system:String x:Key="Str.Bar.Collapse">Collapse / expand</system:String>
+    <system:String x:Key="Str.Bar.Move">Move</system:String>
+    <system:String x:Key="Str.Region.AreaMode">Screen area</system:String>
+    <system:String x:Key="Str.Region.Menu">Region options</system:String>
+    <system:String x:Key="Str.Region.NoTarget">Select an area or a window to translate.</system:String>
+    <system:String x:Key="Str.Region.NoWindow">No window is selected for translation.</system:String>
+    <system:String x:Key="Str.Region.WindowNotOpen">The window for translation {0} is not open, please open it first.</system:String>
+    <system:String x:Key="Str.Region.WindowMinimized">The window for translation {0} is minimized.</system:String>
+    <system:String x:Key="Str.Region.SelectNewWindow">Select a new window</system:String>
+    <system:String x:Key="Str.Region.SelectArea">Select area</system:String>
+    <system:String x:Key="Str.Region.Refresh">Search for the window again</system:String>
+    <system:String x:Key="Str.Region.WholeWindow">Use the whole window</system:String>
+    <system:String x:Key="Str.Region.HideFrame">Hide frame</system:String>
+    <system:String x:Key="Str.Picker.Title">Select a window to translate</system:String>
+    <system:String x:Key="Str.Picker.PickOnScreen">Pick on screen</system:String>
+    <system:String x:Key="Str.Picker.Refresh">Refresh list</system:String>
+    <system:String x:Key="Str.Picker.Cancel">Cancel</system:String>
+    <system:String x:Key="Str.Picker.Select">Select</system:String>
+    <system:String x:Key="Str.Picker.Browser">Browser</system:String>
+    <system:String x:Key="Str.Picker.PickHint">Click a window to translate it. Esc to cancel.</system:String>
 </ResourceDictionary>

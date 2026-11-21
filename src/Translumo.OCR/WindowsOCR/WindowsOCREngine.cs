@@ -32,11 +32,36 @@ namespace Translumo.OCR.WindowsOCR
 
         public string[] GetTextLines(byte[] image)
         {
-            if (MsEngine == null) 
+            OcrResult result = Recognize(image);
+            if (result == null)
                 return [];
 
+            return result.Lines
+                .Select(GetLineText)
+                .ToArray();
+        }
+
+        public OcrTextBlock[] GetTextBlocks(byte[] image)
+        {
+            OcrResult result = Recognize(image);
+            if (result == null)
+                return [];
+
+            var lines = result.Lines
+                .Where(line => line.Words.Count > 0)
+                .Select(line => new OcrTextLine(GetLineText(line), GetLineBounds(line)))
+                .ToArray();
+
+            return TextBlockGrouper.Group(lines, LanguageDescriptor.UseSpaceRemover ? string.Empty : " ");
+        }
+
+        private OcrResult Recognize(byte[] image)
+        {
+            if (MsEngine == null)
+                return null;
+
             using var stream = new MemoryStream(image);
-            Bitmap bitmap = PreProcess(new Bitmap(stream));
+            using Bitmap bitmap = PreProcess(new Bitmap(stream));
 
             SoftwareBitmap softwareBitmap;
             using (var randStream = new InMemoryRandomAccessStream())
@@ -46,11 +71,26 @@ namespace Translumo.OCR.WindowsOCR
                 softwareBitmap = decoder.GetSoftwareBitmapAsync().AsTask().Result;
             }
 
-            OcrResult result = MsEngine.RecognizeAsync(softwareBitmap).AsTask().Result;
+            using (softwareBitmap)
+            {
+                return MsEngine.RecognizeAsync(softwareBitmap).AsTask().Result;
+            }
+        }
 
-            return result.Lines
-                .Select(line => LanguageDescriptor.UseSpaceRemover ? line.Text.Replace(" ", string.Empty) : line.Text)
-                .ToArray();
+        private string GetLineText(OcrLine line)
+        {
+            return LanguageDescriptor.UseSpaceRemover ? line.Text.Replace(" ", string.Empty) : line.Text;
+        }
+
+        private static RectangleF GetLineBounds(OcrLine line)
+        {
+            var rects = line.Words.Select(word => word.BoundingRect).ToArray();
+            var left = rects.Min(r => r.X);
+            var top = rects.Min(r => r.Y);
+            var right = rects.Max(r => r.X + r.Width);
+            var bottom = rects.Max(r => r.Y + r.Height);
+
+            return new RectangleF((float)left, (float)top, (float)(right - left), (float)(bottom - top));
         }
 
         protected virtual Bitmap PreProcess(Bitmap bitmap)

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -61,6 +63,59 @@ namespace Translumo.OCR.EasyOCR
 
                     return (string[])ocrResult;
                 });
+            }
+        }
+
+        public OcrTextBlock[] GetTextBlocks(byte[] image)
+        {
+            Thread.CurrentThread.Priority = ThreadPriority.AboveNormal;
+            lock (_obj)
+            {
+                if (!_objectsInitialized)
+                {
+                    throw new InvalidOperationException($"EasyOCR is not initialized");
+                }
+
+                var lines = _pythonEngine.Execute(() =>
+                {
+                    // detail=1 returns [[box, text, confidence], ...] where box is 4 corner points [x, y].
+                    // paragraph=false keeps line granularity; grouping into blocks is done by TextBlockGrouper
+                    // so that both OCR engines produce consistent blocks.
+                    dynamic ocrResult = _reader.readtext(_bytes.Invoke(image.ToPython()), detail: 1, paragraph: false);
+                    _readerIsUsed = true;
+
+                    PyObject items = ocrResult;
+                    var result = new List<OcrTextLine>();
+                    var count = items.Length();
+                    for (var i = 0; i < count; i++)
+                    {
+                        using PyObject item = items[i];
+                        using PyObject box = item[0];
+                        var text = item[1].As<string>();
+
+                        float left = float.MaxValue, top = float.MaxValue, right = float.MinValue, bottom = float.MinValue;
+                        var pointsCount = box.Length();
+                        for (var p = 0; p < pointsCount; p++)
+                        {
+                            using PyObject point = box[p];
+                            var x = (float)new PyFloat(point[0]).As<double>();
+                            var y = (float)new PyFloat(point[1]).As<double>();
+                            left = Math.Min(left, x);
+                            top = Math.Min(top, y);
+                            right = Math.Max(right, x);
+                            bottom = Math.Max(bottom, y);
+                        }
+
+                        if (right > left && bottom > top)
+                        {
+                            result.Add(new OcrTextLine(text, new RectangleF(left, top, right - left, bottom - top)));
+                        }
+                    }
+
+                    return result;
+                });
+
+                return TextBlockGrouper.Group(lines, _languageDescriptor.UseSpaceRemover ? string.Empty : " ");
             }
         }
 

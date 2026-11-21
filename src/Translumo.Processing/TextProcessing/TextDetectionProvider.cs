@@ -58,6 +58,14 @@ namespace Translumo.Processing.TextProcessing
             }
         }
 
+        /// <summary>
+        /// Scores how likely the lines are real text in the current source language (0 = not text).
+        /// </summary>
+        public virtual float GetValidityScore(string[] textLines)
+        {
+            return _textValidityPredictor.Predict(textLines, out _);
+        }
+
         public virtual Task<TextDetectionResult> GetTextAsync(IOCREngine ocrEngine, byte[] img)
         {
             return Factory.StartNew(() => GetText(ocrEngine, img));

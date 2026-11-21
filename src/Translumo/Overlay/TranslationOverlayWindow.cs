@@ -49,6 +49,9 @@ namespace Translumo.Overlay
             Focusable = false;
             IsHitTestVisible = false;
             Content = _canvas;
+
+            // Create the handle now: click-through styles, capture exclusion and DPI apply before the first Show()
+            new WindowInteropHelper(this).EnsureHandle();
         }
 
         protected override void OnSourceInitialized(EventArgs e)

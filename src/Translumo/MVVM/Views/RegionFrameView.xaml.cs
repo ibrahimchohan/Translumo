@@ -19,6 +19,8 @@ namespace Translumo.MVVM.Views
         public RegionFrameView()
         {
             InitializeComponent();
+            // Create the handle now: capture exclusion and DPI are known before the first Show()
+            new System.Windows.Interop.WindowInteropHelper(this).EnsureHandle();
             DataContextChanged += OnDataContextChanged;
         }
 
@@ -39,7 +41,6 @@ namespace Translumo.MVVM.Views
         private void Window_SourceInitialized(object sender, EventArgs e)
         {
             WindowHelper.ExcludeFromCapture(this);
-            UpdatePlacement();
         }
 
         private void ViewModelOnPropertyChanged(object sender, PropertyChangedEventArgs e)

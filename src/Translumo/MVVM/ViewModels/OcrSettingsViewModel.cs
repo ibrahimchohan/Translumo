@@ -68,9 +68,11 @@ namespace Translumo.MVVM.ViewModels
         private async Task CheckWindowsOcrAvailabilityAsync()
         {
             var toEnableWindowsOcr = false;
-            var langCode = _languageService.GetLanguageDescriptor(_translationConfiguration.TranslateFromLang).Code;
+            var langDescriptor = _languageService.GetLanguageDescriptor(_translationConfiguration.TranslateFromLang);
+            var langCode = langDescriptor.Code;
 
-            if (WindowsOCRHelper.IsLanguageOcrCapabilityInstalled(langCode, exactMatching: false))
+            // No Windows recognizer exists for this language; the engine is simply not used for it
+            if (!langDescriptor.WindowsOcrSupported || WindowsOCRHelper.IsLanguageOcrCapabilityInstalled(langCode, exactMatching: false))
             {
                 return;
             }

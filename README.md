@@ -40,7 +40,13 @@ Version 1.1.0 moves DeepL and Yandex onto their official APIs, so both now need 
 
 - **Available translators**: Google Translate (works out of the box), DeepL (needs a free API key), Yandex Translate (needs a Yandex Cloud API key).
 
-- **Supported recognition languages**: English, Russian, Japanese, Chinese (Simplified), Korean.
+- **Translation overlay**  
+  Translations can be drawn directly over the source text, block by block (speech bubbles, subtitles, paragraphs), at a similar position and size. The overlay follows scrolling and moves with the window.
+
+- **Window capture**  
+  Pick a window (for example a browser) instead of a fixed screen area. The capture area follows the window, uses the page area of Chromium-based browsers, pauses while the window is minimized and hides the overlay while another window covers it.
+
+- **Supported recognition languages**: English, Russian, Japanese, Chinese (Simplified), Chinese (Traditional), Korean, Portuguese, Vietnamese (EasyOCR only).
 
 - **Supported translation languages**: English, Russian, Japanese, Chinese (Simplified), Korean, French, Spanish, German, Portuguese, Italian, Vietnamese, Thai, Turkish, Arabic, Greek, Brazilian Portuguese, Polish, Belarusian, Persian, Indonesian, Bulgarian, Czech, Danish, Estonian, Finnish, Hungarian, Lithuanian, Latvian, Dutch, Romanian, Slovak, Slovenian, Swedish, Ukrainian.
 
@@ -60,11 +66,15 @@ Version 1.1.0 moves DeepL and Yandex onto their official APIs, so both now need 
 
 ![Preview](https://github.com/ramjke/Translumo/blob/7f4a73ffba0e5a0090ea0bfc3d72acb99832a0f4/docs/preview-EN.gif)
 
-1. Open the Settings (**Alt+G**)
+1. Open the Settings (**Alt+G**) or use the gear button on the control bar
 2. Select languages: source language for OCR and translation language
 3. Select text recognition engines (see Usage Tips for recommended modes)
-4. Define the capture area: press **Alt+Q** and select an area on the screen
-5. Run translation (press **~**)
+4. Define what to translate: press **Alt+Q** (or the crop button) and select an area on the screen, or use the window button on the control bar to pick a window. With a window selected, **Alt+Q** selects a part of that window.
+5. Optionally turn on **Overlay** on the control bar to show translations over the source text
+6. Run translation (press **~** or the play button)
+
+### Recognition models for new languages
+Portuguese, Vietnamese and Chinese (Traditional) use EasyOCR models that are not part of the bundled components (`latin_g2.pth`, `chinese.pth`). EasyOCR downloads a missing model once on first use. Windows OCR has no Vietnamese recognizer, so Vietnamese requires EasyOCR.
 
 ### Which OCR Engine to Use
 

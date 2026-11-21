@@ -22,6 +22,7 @@
                 <ResourceDictionary Source="/Themes/NumericInput.xaml" />
                 <ResourceDictionary Source="/Themes/CheckBox.xaml" />
                 <ResourceDictionary Source="/Themes/ToggleButton.xaml" />
+                <ResourceDictionary Source="/Themes/Bar.xaml" />
 
                 <ResourceDictionary>
                     <ResourceDictionary.MergedDictionaries>

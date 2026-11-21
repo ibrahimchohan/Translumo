@@ -9,7 +9,9 @@ using Translumo.HotKeys;
 using Translumo.Infrastructure;
 using Translumo.Infrastructure.Constants;
 using Translumo.MVVM.Models;
+using Translumo.MVVM.Views;
 using Translumo.Services;
+using Translumo.Services.Windows;
 using Translumo.Update;
 using Translumo.Utils;
 using RelayCommand = Microsoft.Toolkit.Mvvm.Input.RelayCommand;
@@ -37,10 +39,12 @@ namespace Translumo.MVVM.ViewModels
         private readonly ILogger _logger;
         private readonly HotKeysServiceManager _hotKeysServiceManager;
         private readonly UpdateManager _updateManager;
+        private readonly WindowTracker _windowTracker;
 
         public ChatWindowViewModel(ChatWindowModel model, HotKeysServiceManager hotKeysManager, ChatUITextMediator chatTextMediator, UpdateManager updateManager, 
-            DialogService dialogService, IServiceProvider serviceProvider, ILogger<ChatWindowViewModel> logger)
+            DialogService dialogService, IServiceProvider serviceProvider, ILogger<ChatWindowViewModel> logger, WindowTracker windowTracker)
         {
+            this._windowTracker = windowTracker;
             this.Model = model;
             this._logger = logger;
             this._dialogService = dialogService;
@@ -57,6 +61,26 @@ namespace Translumo.MVVM.ViewModels
             hotKeysManager.WindowStyleChangeKeyPressed += HotKeysManagerOnWindowStyleChangeKeyPressed;
             chatTextMediator.TextRaised += ChatTextMediatorOnTextRaised;
             chatTextMediator.ClearTextsRaised += ChatTextMediatorOnClearTextsRaised;
+        }
+
+        public void ToggleTranslation() => HotKeysManagerOnTranslationStateKeyPressed(this, EventArgs.Empty);
+
+        public void SelectArea() => HotKeysManagerOnSelectAreaKeyPressed(this, EventArgs.Empty);
+
+        public void ToggleSettings() => OnShowHideSettings();
+
+        /// <summary>Shows or hides the chat (text) window without starting or stopping translation.</summary>
+        public void ToggleChatVisibility() => ChatWindowIsVisible = !ChatWindowIsVisible;
+
+        public void SelectWindow()
+        {
+            Model.EndTranslation();
+
+            var result = _dialogService.ShowWindowDialog<WindowPickerWindow>(out var window);
+            if (result == true && window.SelectedWindow != null)
+            {
+                _windowTracker.SetTarget(window.SelectedWindow);
+            }
         }
 
         private void HotKeysManagerOnSettingVisibilityKeyPressed(object sender, EventArgs e)
@@ -99,7 +123,7 @@ namespace Translumo.MVVM.ViewModels
             var result = _dialogService.ShowWindowDialog<SelectionAreaWindow>(out var window);
             if (result.HasValue && result.Value)
             {
-                Model.CaptureConfiguration.CaptureArea = window.SelectedArea;
+                _windowTracker.SetSelectedArea(window.SelectedArea);
             }
         }
 

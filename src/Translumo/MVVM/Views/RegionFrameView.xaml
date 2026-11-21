@@ -1,0 +1,127 @@
+<Window
+    x:Class="Translumo.MVVM.Views.RegionFrameView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    Title="Translumo region"
+    AllowsTransparency="True"
+    Background="Transparent"
+    ResizeMode="NoResize"
+    ShowActivated="False"
+    ShowInTaskbar="False"
+    SourceInitialized="Window_SourceInitialized"
+    Topmost="True"
+    WindowStyle="None">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+    </Window.Resources>
+
+    <!--  The transparent interior lets clicks through to the window underneath  -->
+    <Grid>
+        <Rectangle
+            Margin="1"
+            RadiusX="2"
+            RadiusY="2"
+            Stroke="{StaticResource Bar.Frame}"
+            StrokeDashArray="5 4"
+            StrokeThickness="1.5" />
+
+        <Border
+            Margin="4,3,0,0"
+            Padding="5,1"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Background="{StaticResource Bar.Background}"
+            CornerRadius="4">
+            <TextBlock
+                FontSize="13"
+                FontWeight="Bold"
+                Foreground="{StaticResource Bar.Foreground}"
+                Text="{Binding RegionNumber}" />
+        </Border>
+
+        <Button
+            x:Name="MenuButton"
+            Margin="0,2,2,0"
+            Padding="4,2"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Top"
+            Background="{StaticResource Bar.Background}"
+            Click="MenuButton_Click"
+            Style="{StaticResource BarIconButton}"
+            ToolTip="{DynamicResource Str.Region.Menu}">
+            <materialDesign:PackIcon
+                Width="18"
+                Height="18"
+                Kind="DotsHorizontal" />
+            <Button.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Command="{Binding SelectWindowCommand}" Header="{DynamicResource Str.Region.SelectNewWindow}" />
+                    <MenuItem Command="{Binding SelectAreaCommand}" Header="{DynamicResource Str.Region.SelectArea}" />
+                    <MenuItem
+                        Command="{Binding UseWholeWindowCommand}"
+                        Header="{DynamicResource Str.Region.WholeWindow}"
+                        Visibility="{Binding CanUseWholeWindow, Converter={StaticResource BoolToVisibility}}" />
+                    <Separator />
+                    <MenuItem Command="{Binding HideFrameCommand}" Header="{DynamicResource Str.Region.HideFrame}" />
+                </ContextMenu>
+            </Button.ContextMenu>
+        </Button>
+
+        <!--  Status panel  -->
+        <StackPanel
+            MaxWidth="560"
+            Margin="12"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Center"
+            Visibility="{Binding HasProblem, Converter={StaticResource BoolToVisibility}}">
+            <Border
+                Padding="24,22"
+                Background="{StaticResource Bar.Panel}"
+                CornerRadius="6">
+                <TextBlock
+                    FontSize="16"
+                    FontWeight="SemiBold"
+                    Foreground="{StaticResource Bar.Danger}"
+                    Text="{Binding StatusMessage}"
+                    TextAlignment="Center"
+                    TextWrapping="Wrap" />
+            </Border>
+            <StackPanel
+                Margin="0,12,0,0"
+                HorizontalAlignment="Center"
+                Orientation="Horizontal">
+                <Button Command="{Binding SelectWindowCommand}" Style="{StaticResource BarAccentButton}">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon
+                            Width="18"
+                            Height="18"
+                            Margin="0,0,6,0"
+                            VerticalAlignment="Center"
+                            Kind="ApplicationOutline" />
+                        <TextBlock VerticalAlignment="Center" Text="{DynamicResource Str.Region.SelectNewWindow}" />
+                    </StackPanel>
+                </Button>
+                <Button
+                    Margin="8,0,0,0"
+                    Background="{StaticResource Bar.Background}"
+                    Command="{Binding SelectAreaCommand}"
+                    Content="{DynamicResource Str.Region.SelectArea}"
+                    Style="{StaticResource BarTextButton}" />
+            </StackPanel>
+            <Button
+                Margin="0,10,0,0"
+                HorizontalAlignment="Center"
+                Background="{StaticResource Bar.Background}"
+                Command="{Binding RefreshCommand}"
+                Style="{StaticResource BarIconButton}"
+                ToolTip="{DynamicResource Str.Region.Refresh}"
+                Visibility="{Binding CanRefresh, Converter={StaticResource BoolToVisibility}}">
+                <materialDesign:PackIcon
+                    Width="20"
+                    Height="20"
+                    Kind="Refresh" />
+            </Button>
+        </StackPanel>
+    </Grid>
+</Window>

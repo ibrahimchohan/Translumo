@@ -142,6 +142,11 @@ namespace Translumo
             dialogService.ShowWindowAsync(chatViewModel);
             _serviceProvider.GetService<OverlayPresenter>();
 
+            var controlBar = new MVVM.Views.ControlBarView { DataContext = _serviceProvider.GetService<ControlBarViewModel>() };
+            controlBar.Show();
+            // Shows itself when there is something to show (selected region, or a hint what to select)
+            _ = new MVVM.Views.RegionFrameView { DataContext = _serviceProvider.GetService<RegionFrameViewModel>() };
+
             _serviceProvider.RegisterUIInputController();
         }
 
@@ -170,6 +175,9 @@ namespace Translumo
             services.AddSingleton<Services.AnkiService>();
             services.AddSingleton<ChatWindowViewModel>();
             services.AddSingleton<OverlayPresenter>();
+            services.AddSingleton<ControlBarViewModel>();
+            services.AddSingleton<RegionFrameViewModel>();
+            services.AddSingleton<Services.Windows.WindowTracker>();
             services.AddSingleton<ChatWindowModel>();
             services.AddSingleton<HotKeysServiceManager>();
             services.AddSingleton<ScreenCaptureConfiguration>();

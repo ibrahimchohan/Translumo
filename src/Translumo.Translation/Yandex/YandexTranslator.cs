@@ -34,8 +34,11 @@ namespace Translumo.Translation.Yandex
         protected override async Task<string> TranslateTextInternal(YandexContainer container, string sourceText)
         {
             var apiKey = TranslationConfiguration.YandexApiKey.Trim();
-            var targetLangCode = TargetLangDescriptor.RegionalVariant ? TargetLangDescriptor.Code : TargetLangDescriptor.IsoCode;
-            var request = new YandexApiRequest(sourceText, SourceLangDescriptor.IsoCode, targetLangCode);
+            var targetLangCode = TargetLangDescriptor.Language == Languages.ChineseTraditional
+                ? "zh"
+                : TargetLangDescriptor.RegionalVariant ? TargetLangDescriptor.Code : TargetLangDescriptor.IsoCode;
+            var sourceLangCode = SourceLangDescriptor.Language == Languages.ChineseTraditional ? "zh" : SourceLangDescriptor.IsoCode;
+            var request = new YandexApiRequest(sourceText, sourceLangCode, targetLangCode);
             container.Reader.OptionalHeaders["Authorization"] = $"Api-Key {apiKey}";
 
             var response = await container.Reader

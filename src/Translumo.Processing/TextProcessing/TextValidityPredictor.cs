@@ -30,6 +30,7 @@ namespace Translumo.Processing.TextProcessing
         private LanguageDescriptor _languageDescriptor;
         private Regex _langAlphabetRegex;
         private TextTokenizer _textTokenizer;
+        private bool _useHeuristicScore;
 
         private readonly IPredictor<InputTextPrediction, OutputTextPrediction> _validityPredictor;
         private readonly LanguageService _languageService;
@@ -101,6 +102,11 @@ namespace Translumo.Processing.TextProcessing
                 validatedText = _textTokenizer.Tokenize(validatedText);
             }
 
+            if (_useHeuristicScore)
+            {
+                return HeuristicTextScorer.Score(validatedText, _langAlphabetRegex, _languageDescriptor.Asian);
+            }
+
             var curAttempt = 0;
             if (!_validityPredictor.Loaded)
             {
@@ -129,16 +135,19 @@ namespace Translumo.Processing.TextProcessing
             _sync.Reset();
             _logger.LogTrace($"Initialization prediction model (lang: {Language})");
             _languageDescriptor = _languageService.GetLanguageDescriptor(Language);
-            var modelPath = Path.Combine(_predictionModelsPath, _languageDescriptor.TextScorePredictorModel);
-
-            try
+            _useHeuristicScore = string.IsNullOrEmpty(_languageDescriptor.TextScorePredictorModel);
+            if (!_useHeuristicScore)
             {
-                _validityPredictor.LoadModel(modelPath);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Predictor model loading error");
-                throw;
+                var modelPath = Path.Combine(_predictionModelsPath, _languageDescriptor.TextScorePredictorModel);
+                try
+                {
+                    _validityPredictor.LoadModel(modelPath);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, $"Predictor model loading error");
+                    throw;
+                }
             }
 
             _sync.Set();

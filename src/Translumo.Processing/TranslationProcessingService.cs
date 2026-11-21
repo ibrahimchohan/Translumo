@@ -37,6 +37,7 @@ namespace Translumo.Processing
         private readonly TextDetectionProvider _textProvider;
         private readonly TextResultCacheService _textResultCacheService;
         private readonly OverlayFrameProcessor _overlayProcessor = new OverlayFrameProcessor();
+        private readonly ScrollShiftDetector _scrollShiftDetector = new ScrollShiftDetector();
         private readonly ILogger _logger;
         private readonly object _obj = new object();
         private readonly object _ttsLock = new object();
@@ -95,7 +96,7 @@ namespace Translumo.Processing
 
             if (!_engines.Any())
             {
-                _chatTextMediator.SendText("No OCR engine is selected!", false);
+                _chatTextMediator.SendText("No OCR engine is selected or available for the source language! (Vietnamese text can only be recognized by EasyOCR)", false);
                 return;
             }
 
@@ -205,6 +206,13 @@ namespace Translumo.Processing
                     {
                         if (!EnginesEnsureActual())
                         {
+                            continue;
+                        }
+
+                        if (_capturer is { IsCaptureAvailable: false })
+                        {
+                            // Target window is minimized or closed: wait until it is back
+                            lastIterationType = IterationType.Short;
                             continue;
                         }
 
@@ -391,6 +399,15 @@ namespace Translumo.Processing
         private IterationType RunOverlayIteration(IOCREngine[] engines, CancellationToken cancellationToken)
         {
             byte[] screenshot = _capturer.CaptureScreen();
+
+            // Scroll tracking: move the shown blocks with the content right away; OCR below then refines positions
+            var shifted = _scrollShiftDetector.TryDetectShift(screenshot, out var dx, out var dy) && _overlayProcessor.HasVisibleBlocks;
+            if (shifted)
+            {
+                _chatTextMediator.SendOverlayShift(dx, dy);
+                _overlayProcessor.InvalidatePublishedFrame();
+            }
+
             OcrTextBlock[] blocks = DetectOverlayBlocks(engines, screenshot);
             if (blocks == null)
             {
@@ -418,7 +435,8 @@ namespace Translumo.Processing
             }
 
             _chatTextMediator.SendOverlayBlocks(frame);
-            return IterationType.Full;
+            // While the content is moving, poll faster to keep the blocks in place
+            return shifted ? IterationType.Short : IterationType.Full;
         }
 
         private OcrTextBlock[] DetectOverlayBlocks(IOCREngine[] engines, byte[] screenshot)
@@ -447,6 +465,7 @@ namespace Translumo.Processing
         private void ClearOverlay()
         {
             _overlayProcessor.Reset();
+            _scrollShiftDetector.Reset();
             _chatTextMediator.SendOverlayBlocks(Array.Empty<OverlayTextBlock>());
         }
 
@@ -571,6 +590,7 @@ namespace Translumo.Processing
             }
 
             _textProvider.Dispose();
+            _scrollShiftDetector.Dispose();
             _capturer?.Dispose();
             _onceTimeCapturer?.Dispose();
         }

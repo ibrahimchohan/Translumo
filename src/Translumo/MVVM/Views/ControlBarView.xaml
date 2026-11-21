@@ -1,0 +1,202 @@
+<Window
+    x:Class="Translumo.MVVM.Views.ControlBarView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:common="clr-namespace:Translumo.MVVM.Common"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    Title="Translumo"
+    AllowsTransparency="True"
+    Background="Transparent"
+    ResizeMode="NoResize"
+    ShowActivated="False"
+    ShowInTaskbar="False"
+    SizeToContent="WidthAndHeight"
+    SourceInitialized="Window_SourceInitialized"
+    Topmost="True"
+    WindowStyle="None">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+        <Style BasedOn="{StaticResource BarToolTip}" TargetType="ToolTip" />
+        <Style x:Key="BarIcon" TargetType="materialDesign:PackIcon">
+            <Setter Property="Width" Value="18" />
+            <Setter Property="Height" Value="18" />
+        </Style>
+        <Style x:Key="BarCaption" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource Bar.Foreground}" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+    </Window.Resources>
+
+    <Border
+        Margin="6"
+        Padding="6,4"
+        Background="{StaticResource Bar.Background}"
+        BorderBrush="{StaticResource Bar.Border}"
+        BorderThickness="1"
+        CornerRadius="24">
+        <Border.Effect>
+            <DropShadowEffect
+                BlurRadius="12"
+                Opacity="0.45"
+                ShadowDepth="2" />
+        </Border.Effect>
+        <StackPanel Orientation="Horizontal">
+            <!--  Start / stop  -->
+            <Button
+                Command="{Binding ToggleTranslationCommand}"
+                Style="{StaticResource BarIconButton}"
+                ToolTip="{DynamicResource Str.Bar.StartStop}">
+                <Grid>
+                    <materialDesign:PackIcon Kind="Play">
+                        <materialDesign:PackIcon.Style>
+                            <Style BasedOn="{StaticResource BarIcon}" TargetType="materialDesign:PackIcon">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsRunning}" Value="True">
+                                        <Setter Property="Kind" Value="Stop" />
+                                        <Setter Property="Foreground" Value="{StaticResource Bar.Danger}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </materialDesign:PackIcon.Style>
+                    </materialDesign:PackIcon>
+                    <Ellipse
+                        Width="6"
+                        Height="6"
+                        Margin="0,-6,-6,0"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        Fill="{StaticResource Bar.Success}"
+                        Visibility="{Binding IsRunning, Converter={StaticResource BoolToVisibility}}" />
+                </Grid>
+            </Button>
+
+            <StackPanel Orientation="Horizontal">
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsCollapsed}" Value="True">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+
+                <Border Style="{StaticResource BarSeparator}" />
+
+                <!--  Languages (opens settings, where language changes are validated)  -->
+                <Button
+                    Command="{Binding OpenSettingsCommand}"
+                    Style="{StaticResource BarTextButton}"
+                    ToolTip="{DynamicResource Str.Bar.Languages}">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon
+                            Margin="0,0,6,0"
+                            Foreground="{StaticResource Bar.Muted}"
+                            Kind="Translate"
+                            Style="{StaticResource BarIcon}" />
+                        <TextBlock Style="{StaticResource BarCaption}" Text="{Binding LanguagesCaption}" />
+                    </StackPanel>
+                </Button>
+
+                <Border Style="{StaticResource BarSeparator}" />
+
+                <!--  Capture target  -->
+                <Button
+                    Command="{Binding SelectAreaCommand}"
+                    Style="{StaticResource BarIconButton}"
+                    ToolTip="{DynamicResource Str.Bar.SelectArea}">
+                    <materialDesign:PackIcon Kind="Crop" Style="{StaticResource BarIcon}" />
+                </Button>
+                <Button
+                    Command="{Binding SelectWindowCommand}"
+                    Style="{StaticResource BarTextButton}"
+                    ToolTip="{DynamicResource Str.Bar.SelectWindow}">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="ApplicationOutline">
+                            <materialDesign:PackIcon.Style>
+                                <Style BasedOn="{StaticResource BarIcon}" TargetType="materialDesign:PackIcon">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsWindowMode}" Value="True">
+                                            <Setter Property="Foreground" Value="{StaticResource Bar.AccentHover}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </materialDesign:PackIcon.Style>
+                        </materialDesign:PackIcon>
+                        <TextBlock
+                            MaxWidth="110"
+                            Margin="6,0,0,0"
+                            Style="{StaticResource BarCaption}"
+                            Text="{Binding TargetCaption}"
+                            TextTrimming="CharacterEllipsis" />
+                    </StackPanel>
+                </Button>
+
+                <Border Style="{StaticResource BarSeparator}" />
+
+                <!--  Overlay mode  -->
+                <ToggleButton
+                    Margin="6,0"
+                    Content="{DynamicResource Str.Bar.Overlay}"
+                    IsChecked="{Binding TextProcessing.OverlayMode}"
+                    Style="{StaticResource BarSwitch}"
+                    ToolTip="{DynamicResource Str.AppearanceSettings.OverlayMode}" />
+
+                <Button
+                    Command="{Binding ToggleChatCommand}"
+                    Style="{StaticResource BarIconButton}"
+                    ToolTip="{DynamicResource Str.Bar.Chat}">
+                    <materialDesign:PackIcon Kind="MessageText" Style="{StaticResource BarIcon}" />
+                </Button>
+
+                <Border Style="{StaticResource BarSeparator}" />
+
+                <Button
+                    Command="{Binding OpenSettingsCommand}"
+                    Style="{StaticResource BarIconButton}"
+                    ToolTip="{DynamicResource Str.Bar.Settings}">
+                    <materialDesign:PackIcon Kind="Cog" Style="{StaticResource BarIcon}" />
+                </Button>
+                <Button
+                    Command="{common:CloseAppCommand}"
+                    Style="{StaticResource BarIconButton}"
+                    ToolTip="{DynamicResource Str.Bar.Exit}">
+                    <materialDesign:PackIcon Kind="Close" Style="{StaticResource BarIcon}" />
+                </Button>
+            </StackPanel>
+
+            <!--  Collapse / expand  -->
+            <Button
+                Command="{Binding ToggleCollapseCommand}"
+                Style="{StaticResource BarIconButton}"
+                ToolTip="{DynamicResource Str.Bar.Collapse}">
+                <materialDesign:PackIcon Kind="ChevronDoubleLeft">
+                    <materialDesign:PackIcon.Style>
+                        <Style BasedOn="{StaticResource BarIcon}" TargetType="materialDesign:PackIcon">
+                            <Setter Property="Foreground" Value="{StaticResource Bar.Muted}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsCollapsed}" Value="True">
+                                    <Setter Property="Kind" Value="ChevronDoubleRight" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </materialDesign:PackIcon.Style>
+                </materialDesign:PackIcon>
+            </Button>
+
+            <!--  Drag handle  -->
+            <Border
+                Padding="2,6"
+                Background="Transparent"
+                Cursor="SizeAll"
+                MouseLeftButtonDown="DragHandle_MouseLeftButtonDown"
+                ToolTip="{DynamicResource Str.Bar.Move}">
+                <materialDesign:PackIcon
+                    Foreground="{StaticResource Bar.Muted}"
+                    Kind="DragVertical"
+                    Style="{StaticResource BarIcon}" />
+            </Border>
+        </StackPanel>
+    </Border>
+</Window>

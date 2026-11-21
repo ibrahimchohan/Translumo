@@ -94,6 +94,7 @@
     <system:String x:Key="Str.Languages.Japanese">Японский</system:String>
     <system:String x:Key="Str.Languages.Korean">Корейский</system:String>
     <system:String x:Key="Str.Languages.Chinese">Китайский (упрощенный)</system:String>
+    <system:String x:Key="Str.Languages.ChineseTraditional">Китайский (традиционный)</system:String>
     <system:String x:Key="Str.Languages.Italian">Итальянский</system:String>
     <system:String x:Key="Str.Languages.French">Французский</system:String>
     <system:String x:Key="Str.Languages.German">Немецкий</system:String>
@@ -155,4 +156,33 @@
     <system:String x:Key="Str.Lookupper.LinkText">Lookupper — изучение языка через игры →</system:String>
     <system:String x:Key="Str.Lookupper.Url">https://lookupper.ru</system:String>
 
+
+    <system:String x:Key="Str.Bar.StartStop">Запустить / остановить перевод</system:String>
+    <system:String x:Key="Str.Bar.Languages">Языки (открывает настройки)</system:String>
+    <system:String x:Key="Str.Bar.SelectArea">Выбрать область экрана</system:String>
+    <system:String x:Key="Str.Bar.SelectWindow">Выбрать окно для перевода</system:String>
+    <system:String x:Key="Str.Bar.Overlay">Наложение</system:String>
+    <system:String x:Key="Str.Bar.Chat">Показать / скрыть окно перевода</system:String>
+    <system:String x:Key="Str.Bar.Settings">Настройки</system:String>
+    <system:String x:Key="Str.Bar.Exit">Выход</system:String>
+    <system:String x:Key="Str.Bar.Collapse">Свернуть / развернуть</system:String>
+    <system:String x:Key="Str.Bar.Move">Переместить</system:String>
+    <system:String x:Key="Str.Region.AreaMode">Область экрана</system:String>
+    <system:String x:Key="Str.Region.Menu">Параметры области</system:String>
+    <system:String x:Key="Str.Region.NoTarget">Выберите область или окно для перевода.</system:String>
+    <system:String x:Key="Str.Region.NoWindow">Окно для перевода не выбрано.</system:String>
+    <system:String x:Key="Str.Region.WindowNotOpen">Окно для перевода {0} не открыто, сначала откройте его.</system:String>
+    <system:String x:Key="Str.Region.WindowMinimized">Окно для перевода {0} свёрнуто.</system:String>
+    <system:String x:Key="Str.Region.SelectNewWindow">Выбрать другое окно</system:String>
+    <system:String x:Key="Str.Region.SelectArea">Выбрать область</system:String>
+    <system:String x:Key="Str.Region.Refresh">Найти окно снова</system:String>
+    <system:String x:Key="Str.Region.WholeWindow">Использовать всё окно</system:String>
+    <system:String x:Key="Str.Region.HideFrame">Скрыть рамку</system:String>
+    <system:String x:Key="Str.Picker.Title">Выберите окно для перевода</system:String>
+    <system:String x:Key="Str.Picker.PickOnScreen">Указать на экране</system:String>
+    <system:String x:Key="Str.Picker.Refresh">Обновить список</system:String>
+    <system:String x:Key="Str.Picker.Cancel">Отмена</system:String>
+    <system:String x:Key="Str.Picker.Select">Выбрать</system:String>
+    <system:String x:Key="Str.Picker.Browser">Браузер</system:String>
+    <system:String x:Key="Str.Picker.PickHint">Щёлкните по окну, чтобы переводить его. Esc — отмена.</system:String>
 </ResourceDictionary>

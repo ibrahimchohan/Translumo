@@ -27,8 +27,33 @@ namespace Translumo.Processing.Overlay
 
         private readonly object _sync = new object();
         private readonly LimitedDictionary<string, string> _cache = new LimitedDictionary<string, string>(CACHE_CAPACITY, StringComparer.Ordinal);
+        // Signature of the published frame: empty = nothing shown, null = unknown (forces publishing)
         private string _lastSignature = string.Empty;
+        private const string InvalidatedSignature = "\0invalidated";
         private int _emptyFrames;
+
+        /// <summary>True when the overlay currently shows translated blocks.</summary>
+        public bool HasVisibleBlocks
+        {
+            get
+            {
+                lock (_sync)
+                {
+                    return !string.IsNullOrEmpty(_lastSignature);
+                }
+            }
+        }
+
+        /// <summary>
+        /// The UI moved the shown blocks (scrolling): the next frame must be published even if it matches the last one.
+        /// </summary>
+        public void InvalidatePublishedFrame()
+        {
+            lock (_sync)
+            {
+                _lastSignature = InvalidatedSignature;
+            }
+        }
 
         /// <summary>
         /// Drops cached translations (translator or language changed) and forces the next frame to be published.

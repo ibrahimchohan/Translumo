@@ -144,7 +144,15 @@ namespace Translumo.OCR.EasyOCR
             {
                 _builtinsLib = _pythonEngine.Import("builtins");
                 _easyOcrLib = _pythonEngine.Import("easyocr");
-                _reader = _easyOcrLib.Reader(new[] { _languageDescriptor.EasyOcrCode }, model_storage_directory: _modelPath, download_enabled: false, recog_network: _languageDescriptor.EasyOcrModel);
+                // Models of newer languages are not in the bundled components: let EasyOCR download a missing one once
+                var modelFile = _languageDescriptor.EasyOcrModelFile;
+                var downloadEnabled = modelFile != null && !File.Exists(Path.Combine(_modelPath, modelFile));
+                if (downloadEnabled)
+                {
+                    _logger.LogWarning($"EasyOCR model '{modelFile}' is missing and will be downloaded");
+                }
+
+                _reader = _easyOcrLib.Reader(new[] { _languageDescriptor.EasyOcrCode }, model_storage_directory: _modelPath, download_enabled: downloadEnabled, recog_network: _languageDescriptor.EasyOcrModel);
                 _bytes = _builtinsLib.bytes;
 
                 _objectsInitialized = true;

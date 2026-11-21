@@ -30,7 +30,7 @@ namespace Translumo.Translation.Deepl
 
         public override Task<string> TranslateTextAsync(string sourceText)
         {
-            if (_unsupportedLanguages.Contains(TargetLangDescriptor.Language))
+            if (_unsupportedLanguages.Contains(TargetLangDescriptor.Language) || _unsupportedLanguages.Contains(SourceLangDescriptor.Language))
             {
                 throw new TranslationException("DeepL translator is unavailable for this language");
             }
@@ -46,11 +46,15 @@ namespace Translumo.Translation.Deepl
         protected override async Task<string> TranslateTextInternal(DeeplContainer container, string sourceText)
         {
             var apiKey = TranslationConfiguration.DeeplApiKey.Trim();
-            var targetLangCode = TargetLangDescriptor.RegionalVariant
-                ? TargetLangDescriptor.Code.ToUpperInvariant()
-                : TargetLangDescriptor.IsoCode.ToUpperInvariant();
+            var targetLangCode = TargetLangDescriptor.Language == Languages.ChineseTraditional
+                ? "ZH-HANT"
+                : TargetLangDescriptor.RegionalVariant
+                    ? TargetLangDescriptor.Code.ToUpperInvariant()
+                    : TargetLangDescriptor.IsoCode.ToUpperInvariant();
+            // DeepL source languages have no regional variants
+            var sourceLangCode = SourceLangDescriptor.IsoCode.Split('-')[0].ToUpperInvariant();
 
-            var request = new DeepLRequest(sourceText, SourceLangDescriptor.IsoCode.ToUpperInvariant(), targetLangCode);
+            var request = new DeepLRequest(sourceText, sourceLangCode, targetLangCode);
             container.Reader.OptionalHeaders["Authorization"] = $"DeepL-Auth-Key {apiKey}";
 
             var response = await container.Reader

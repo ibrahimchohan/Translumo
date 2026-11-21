@@ -96,7 +96,7 @@ namespace Translumo.Processing
 
             if (!_engines.Any())
             {
-                _chatTextMediator.SendText("No OCR engine is selected!", false);
+                _chatTextMediator.SendText("No OCR engine is selected or available for the source language! (Vietnamese text can only be recognized by EasyOCR)", false);
                 return;
             }
 

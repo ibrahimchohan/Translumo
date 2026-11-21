@@ -40,8 +40,25 @@ namespace Translumo.Infrastructure.Language
                 new LanguageDescriptor() { Language = Languages.French, Code = "fr-FR", IsoCode = "fr", TranslationOnly = true },
                 new LanguageDescriptor() { Language = Languages.German, Code = "de-DE", IsoCode = "de", TranslationOnly = true },
                 new LanguageDescriptor() { Language = Languages.Spanish, Code = "es-ES", IsoCode = "es", TranslationOnly = true },
-                new LanguageDescriptor() { Language = Languages.Portuguese, Code = "pt-PT", IsoCode = "pt", TranslationOnly = true },
-                new LanguageDescriptor() { Language = Languages.Vietnamese, Code = "vi-VN", IsoCode = "vi", TranslationOnly = true },
+                // No text score models are available for the following source languages: heuristic scoring is used
+                new LanguageDescriptor()
+                {
+                    Language = Languages.Portuguese, Code = "pt-PT", EasyOcrCode = "pt", EasyOcrModel = "latin_g2", EasyOcrModelFile = "latin_g2.pth",
+                    IsoCode = "pt", SupportedNamedBlocks = new[] { "IsBasicLatin", "IsLatin-1Supplement" },
+                    UseEndPunctuation = true, UseWordTokenizer = false, UseSpaceRemover = false
+                },
+                new LanguageDescriptor()
+                {
+                    Language = Languages.Vietnamese, Code = "vi-VN", EasyOcrCode = "vi", EasyOcrModel = "latin_g2", EasyOcrModelFile = "latin_g2.pth",
+                    IsoCode = "vi", SupportedNamedBlocks = new[] { "IsBasicLatin", "IsLatin-1Supplement", "IsLatinExtended-A", "IsLatinExtended-B", "IsLatinExtendedAdditional" },
+                    UseEndPunctuation = true, UseWordTokenizer = false, UseSpaceRemover = false, WindowsOcrSupported = false
+                },
+                new LanguageDescriptor()
+                {
+                    Language = Languages.ChineseTraditional, Code = "zh-TW", EasyOcrCode = "ch_tra", EasyOcrModel = "zh_tra_g1", EasyOcrModelFile = "chinese.pth",
+                    IsoCode = "zh-TW", RegionalVariant = true, SupportedNamedBlocks = new[] { "IsCJKUnifiedIdeographs" }, UseEndPunctuation = false,
+                    UseWordTokenizer = true, UseSpaceRemover = true, Asian = true
+                },
                 new LanguageDescriptor() { Language = Languages.Turkish, Code = "tr-TR", IsoCode = "tr", TranslationOnly = true },
                 new LanguageDescriptor() { Language = Languages.Thai, Code = "th-TH", IsoCode = "th", TranslationOnly = true },
                 new LanguageDescriptor() { Language = Languages.Arabic, Code = "ar-SA", IsoCode = "ar", TranslationOnly = true },

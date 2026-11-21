@@ -38,6 +38,9 @@ namespace Translumo.Infrastructure.Language
         Slovak = 30,
         Slovenian = 31,
         Swedish = 32,
-        Ukrainian = 33
+        Ukrainian = 33,
+
+        // Recognition and translation
+        ChineseTraditional = 34
     }
 }

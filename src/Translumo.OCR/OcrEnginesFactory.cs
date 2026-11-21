@@ -35,7 +35,13 @@ namespace Translumo.OCR
             {
                 var confType = ocrConfiguration.GetType();
 
-                if (confType == typeof(WindowsOCRConfiguration))
+                if (confType == typeof(WindowsOCRConfiguration) && !langDescriptor.WindowsOcrSupported)
+                {
+                    // Windows has no recognizer for this language (e.g. Vietnamese): only other engines can be used
+                    RemoveCachedEngine<WindowsOCREngine>();
+                    RemoveCachedEngine<WinOCREngineWithPreprocess>();
+                }
+                else if (confType == typeof(WindowsOCRConfiguration))
                 {
                     if (!TryRemoveIfDisabled<WindowsOCREngine>(ocrConfiguration))
                     {

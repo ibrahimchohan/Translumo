@@ -186,4 +186,8 @@
     <system:String x:Key="Str.Picker.Select">Select</system:String>
     <system:String x:Key="Str.Picker.Browser">Browser</system:String>
     <system:String x:Key="Str.Picker.PickHint">Click a window to translate it. Esc to cancel.</system:String>
+    <system:String x:Key="Str.Bar.FontDecrease">Smaller text</system:String>
+    <system:String x:Key="Str.Bar.FontIncrease">Larger text</system:String>
+    <system:String x:Key="Str.Bar.FontSize">Text size (overlay: % of the source text size)</system:String>
+    <system:String x:Key="Str.AppearanceSettings.OverlayFontScale">Overlay text size, %</system:String>
 </ResourceDictionary>

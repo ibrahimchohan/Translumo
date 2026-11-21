@@ -143,6 +143,28 @@
                     Style="{StaticResource BarSwitch}"
                     ToolTip="{DynamicResource Str.AppearanceSettings.OverlayMode}" />
 
+                <!--  Text size: overlay scale when the overlay is on, otherwise the text window font  -->
+                <Button
+                    Margin="4,0,0,0"
+                    Command="{Binding DecreaseFontCommand}"
+                    Style="{StaticResource BarIconButton}"
+                    ToolTip="{DynamicResource Str.Bar.FontDecrease}">
+                    <materialDesign:PackIcon Kind="FormatFontSizeDecrease" Style="{StaticResource BarIcon}" />
+                </Button>
+                <TextBlock
+                    MinWidth="34"
+                    Foreground="{StaticResource Bar.Muted}"
+                    Style="{StaticResource BarCaption}"
+                    Text="{Binding FontSizeCaption}"
+                    TextAlignment="Center"
+                    ToolTip="{DynamicResource Str.Bar.FontSize}" />
+                <Button
+                    Command="{Binding IncreaseFontCommand}"
+                    Style="{StaticResource BarIconButton}"
+                    ToolTip="{DynamicResource Str.Bar.FontIncrease}">
+                    <materialDesign:PackIcon Kind="FormatFontSizeIncrease" Style="{StaticResource BarIcon}" />
+                </Button>
+
                 <Button
                     Command="{Binding ToggleChatCommand}"
                     Style="{StaticResource BarIconButton}"

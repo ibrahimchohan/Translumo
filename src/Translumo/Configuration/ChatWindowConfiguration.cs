@@ -67,6 +67,21 @@ namespace Translumo.Configuration
             }
         }
 
+        public const int MIN_OVERLAY_FONT_SCALE = 50;
+        public const int MAX_OVERLAY_FONT_SCALE = 250;
+
+        /// <summary>
+        /// Overlay text size in percent of the size that matches the source text (100 = same size as the original).
+        /// </summary>
+        public int OverlayFontScalePercent
+        {
+            get => _overlayFontScalePercent;
+            set
+            {
+                SetProperty(ref _overlayFontScalePercent, Math.Clamp(value, MIN_OVERLAY_FONT_SCALE, MAX_OVERLAY_FONT_SCALE));
+            }
+        }
+
         public int LineSpacing
         {
             get => _lineSpacing;
@@ -104,7 +119,8 @@ namespace Translumo.Configuration
             FontBold = true,
             ExcludeFromCaptue = true,
             LineSpacing = 14,
-            TextAlignment = TextAlignment.Left
+            TextAlignment = TextAlignment.Left,
+            OverlayFontScalePercent = 100
         };
 
         private Color _backgroundColor = Color.FromRgb(0, 0, 0);
@@ -114,6 +130,7 @@ namespace Translumo.Configuration
         private bool _fontBold = true;
         private bool _excludeFromCaptue = true;
         private int _lineSpacing = 14;
+        private int _overlayFontScalePercent = 100;
         private TextProcessingConfiguration _textProcessing = TextProcessingConfiguration.Default;
         private TextAlignment _textAlignment;
     }

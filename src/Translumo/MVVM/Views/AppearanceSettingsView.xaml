@@ -44,6 +44,7 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="56" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <StackPanel
                 Grid.Row="0"
@@ -155,11 +156,21 @@
                 <Label Content="{DynamicResource Str.AppearanceSettings.KeepFormatting}" Style="{StaticResource ControlCaptionLabel}" />
             </StackPanel>
             <StackPanel
-                Grid.Row="5"
-                Grid.Column="1"
+                Grid.Row="6"
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                Margin="0,16,0,0"
                 Orientation="Horizontal">
                 <ToggleButton IsChecked="{Binding Model.TextProcessing.OverlayMode}" Style="{StaticResource PrimaryToggleButton}" />
                 <Label Content="{DynamicResource Str.AppearanceSettings.OverlayMode}" Style="{StaticResource ControlCaptionLabel}" />
+                <controls:NumericInput
+                    Width="84"
+                    Margin="24,0,0,0"
+                    Maximum="250"
+                    Minimum="50"
+                    Step="10"
+                    Value="{Binding Model.OverlayFontScalePercent, Mode=TwoWay}" />
+                <Label Content="{DynamicResource Str.AppearanceSettings.OverlayFontScale}" Style="{StaticResource ControlCaptionLabel}" />
             </StackPanel>
             <StackPanel
                 Grid.Row="4"

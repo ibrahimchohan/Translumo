@@ -22,6 +22,7 @@ namespace Translumo.Utils
                 confStorage.RegisterConfiguration<TtsConfiguration>();
                 confStorage.RegisterConfiguration<SystemConfiguration>();
                 confStorage.RegisterConfiguration<HotKeysConfiguration>();
+                confStorage.RegisterConfiguration<ScreenCaptureConfiguration>();
 
                 return confStorage;
             });

@@ -13,6 +13,7 @@ namespace Translumo.Services
         public event EventHandler ClearTextsRaised;
         public event EventHandler<TranslatedWithOriginalEventArgs> TextWithOriginalRaised;
         public event EventHandler<OverlayBlocksEventArgs> OverlayBlocksRaised;
+        public event EventHandler<OverlayShiftEventArgs> OverlayShiftRaised;
 
         public void SendText(string text, bool successful)
         {
@@ -37,6 +38,23 @@ namespace Translumo.Services
         public void SendOverlayBlocks(IReadOnlyList<OverlayTextBlock> blocks)
         {
             OverlayBlocksRaised?.RaiseOnUIThread(this, new OverlayBlocksEventArgs(blocks));
+        }
+
+        public void SendOverlayShift(float dx, float dy)
+        {
+            OverlayShiftRaised?.RaiseOnUIThread(this, new OverlayShiftEventArgs(dx, dy));
+        }
+    }
+
+    public class OverlayShiftEventArgs : EventArgs
+    {
+        public float Dx { get; }
+        public float Dy { get; }
+
+        public OverlayShiftEventArgs(float dx, float dy)
+        {
+            Dx = dx;
+            Dy = dy;
         }
     }
 

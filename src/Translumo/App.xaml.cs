@@ -170,6 +170,7 @@ namespace Translumo
             services.AddSingleton<Services.AnkiService>();
             services.AddSingleton<ChatWindowViewModel>();
             services.AddSingleton<OverlayPresenter>();
+            services.AddSingleton<Services.Windows.WindowTracker>();
             services.AddSingleton<ChatWindowModel>();
             services.AddSingleton<HotKeysServiceManager>();
             services.AddSingleton<ScreenCaptureConfiguration>();

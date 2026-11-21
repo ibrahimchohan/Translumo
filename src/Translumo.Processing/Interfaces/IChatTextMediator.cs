@@ -19,5 +19,10 @@ namespace Translumo.Processing.Interfaces
         /// Replaces the blocks shown by the on-screen overlay. An empty list clears the overlay.
         /// </summary>
         void SendOverlayBlocks(IReadOnlyList<OverlayTextBlock> blocks);
+
+        /// <summary>
+        /// Moves the blocks currently shown by the overlay (physical pixels), e.g. when the content was scrolled.
+        /// </summary>
+        void SendOverlayShift(float dx, float dy);
     }
 }

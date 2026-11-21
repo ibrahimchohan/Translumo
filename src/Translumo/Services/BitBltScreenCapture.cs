@@ -14,6 +14,7 @@ namespace Translumo.Services
     {
         public int CaptureAttempts { get; set; } = 3;
         public int AttemptDelayMs { get; set; } = 300;
+        public bool IsCaptureAvailable => !_configuration.CaptureSuspended;
 
         private int _height;
         private int _width;
@@ -61,13 +62,21 @@ namespace Translumo.Services
                 hdcSrc = Win32Interfaces.GetDCEx(IntPtr.Zero, IntPtr.Zero,
                     DeviceContextValues.Window | DeviceContextValues.Cache | DeviceContextValues.LockWindowUpdate);
                 hdcDest = Win32Interfaces.CreateCompatibleDC(hdcSrc);
-                hBitmap = Win32Interfaces.CreateCompatibleBitmap(hdcSrc, _width, _height);
+                // Copy only the requested area. Screen DC coordinates are virtual-screen coordinates,
+                // so areas on secondary monitors (including negative coordinates) work as well.
+                var area = Rectangle.Round(captureArea);
+                if (area.Width <= 0 || area.Height <= 0)
+                {
+                    throw new CaptureException("Capture area is empty");
+                }
+
+                hBitmap = Win32Interfaces.CreateCompatibleBitmap(hdcSrc, area.Width, area.Height);
                 var hOld = Win32Interfaces.SelectObject(hdcDest, hBitmap);
-                Win32Interfaces.BitBlt(hdcDest, 0, 0, _width, _height, hdcSrc, 0, 0, TernaryRasterOperations.SRCCOPY);
+                Win32Interfaces.BitBlt(hdcDest, 0, 0, area.Width, area.Height, hdcSrc, area.X, area.Y, TernaryRasterOperations.SRCCOPY);
                 Win32Interfaces.SelectObject(hdcDest, hOld);
 
                 using var img = Image.FromHbitmap(hBitmap);
-                using var bitmap = img.Clone(captureArea, PixelFormat.Format32bppArgb);
+                using var bitmap = img.Clone(new Rectangle(0, 0, area.Width, area.Height), PixelFormat.Format32bppArgb);
 
                 return bitmap.ToBytes(ImageFormat.Tiff);
             }

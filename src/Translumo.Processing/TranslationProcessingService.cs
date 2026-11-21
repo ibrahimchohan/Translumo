@@ -208,6 +208,13 @@ namespace Translumo.Processing
                             continue;
                         }
 
+                        if (_capturer is { IsCaptureAvailable: false })
+                        {
+                            // Target window is minimized or closed: wait until it is back
+                            lastIterationType = IterationType.Short;
+                            continue;
+                        }
+
                         if (_textProcessingConfiguration.OverlayMode)
                         {
                             overlayActive = true;

@@ -10,6 +10,7 @@ using Translumo.Infrastructure;
 using Translumo.Infrastructure.Constants;
 using Translumo.MVVM.Models;
 using Translumo.Services;
+using Translumo.Services.Windows;
 using Translumo.Update;
 using Translumo.Utils;
 using RelayCommand = Microsoft.Toolkit.Mvvm.Input.RelayCommand;
@@ -37,10 +38,12 @@ namespace Translumo.MVVM.ViewModels
         private readonly ILogger _logger;
         private readonly HotKeysServiceManager _hotKeysServiceManager;
         private readonly UpdateManager _updateManager;
+        private readonly WindowTracker _windowTracker;
 
         public ChatWindowViewModel(ChatWindowModel model, HotKeysServiceManager hotKeysManager, ChatUITextMediator chatTextMediator, UpdateManager updateManager, 
-            DialogService dialogService, IServiceProvider serviceProvider, ILogger<ChatWindowViewModel> logger)
+            DialogService dialogService, IServiceProvider serviceProvider, ILogger<ChatWindowViewModel> logger, WindowTracker windowTracker)
         {
+            this._windowTracker = windowTracker;
             this.Model = model;
             this._logger = logger;
             this._dialogService = dialogService;
@@ -99,7 +102,7 @@ namespace Translumo.MVVM.ViewModels
             var result = _dialogService.ShowWindowDialog<SelectionAreaWindow>(out var window);
             if (result.HasValue && result.Value)
             {
-                Model.CaptureConfiguration.CaptureArea = window.SelectedArea;
+                _windowTracker.SetSelectedArea(window.SelectedArea);
             }
         }
 

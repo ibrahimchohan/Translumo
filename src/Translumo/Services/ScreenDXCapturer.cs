@@ -16,6 +16,7 @@ namespace Translumo.Services
     {
         public int CaptureAttempts { get; set; } = 5;
         public int AttemptDelayMs { get; set; } = 250;
+        public bool IsCaptureAvailable => !_configuration.CaptureSuspended;
 
         private Factory1 _factory;
         private Adapter1 _adapter;

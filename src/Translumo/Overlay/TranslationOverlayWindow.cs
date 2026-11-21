@@ -63,6 +63,38 @@ namespace Translumo.Overlay
             SetWindowDisplayAffinity(hwnd, WDA_EXCLUDEFROMCAPTURE);
         }
 
+        private System.Drawing.RectangleF _area;
+        private bool _hasBlocks;
+        private bool _suppressed;
+
+        /// <summary>
+        /// Moves the overlay over the capture area (physical screen pixels). Blocks keep their position relative
+        /// to the area, so they follow the target window when it is moved.
+        /// </summary>
+        public void UpdateArea(System.Drawing.RectangleF captureArea)
+        {
+            if (captureArea.IsEmpty || captureArea == _area)
+            {
+                return;
+            }
+
+            _area = captureArea;
+            var dpi = VisualTreeHelper.GetDpi(this);
+            Left = captureArea.X / dpi.DpiScaleX;
+            Top = captureArea.Y / dpi.DpiScaleY;
+            Width = captureArea.Width / dpi.DpiScaleX;
+            Height = captureArea.Height / dpi.DpiScaleY;
+        }
+
+        /// <summary>
+        /// Hides the overlay without dropping its blocks (target window is covered, minimized or the user hid it).
+        /// </summary>
+        public void SetSuppressed(bool suppressed)
+        {
+            _suppressed = suppressed;
+            UpdateVisibility();
+        }
+
         /// <param name="captureArea">Capture area in physical screen pixels.</param>
         /// <param name="blocks">Blocks with bounds in physical pixels relative to the capture area.</param>
         public void ShowBlocks(System.Drawing.RectangleF captureArea, IReadOnlyList<OverlayTextBlock> blocks, ChatWindowConfiguration style)
@@ -73,17 +105,9 @@ namespace Translumo.Overlay
                 return;
             }
 
-            if (!IsVisible)
-            {
-                Show();
-            }
+            UpdateArea(captureArea);
 
             var dpi = VisualTreeHelper.GetDpi(this);
-            Left = captureArea.X / dpi.DpiScaleX;
-            Top = captureArea.Y / dpi.DpiScaleY;
-            Width = captureArea.Width / dpi.DpiScaleX;
-            Height = captureArea.Height / dpi.DpiScaleY;
-
             var background = new SolidColorBrush(style.BackgroundColor) { Opacity = style.BackgroundOpacity };
             var foreground = new SolidColorBrush(style.FontColor);
             background.Freeze();
@@ -98,12 +122,39 @@ namespace Translumo.Overlay
                 Canvas.SetTop(element, block.Bounds.Y / dpi.DpiScaleY);
                 _canvas.Children.Add(element);
             }
+
+            _hasBlocks = true;
+            UpdateVisibility();
+        }
+
+        /// <summary>
+        /// Moves all blocks by the given offset (physical pixels), e.g. when the content was scrolled.
+        /// </summary>
+        public void ShiftBlocks(float dx, float dy)
+        {
+            var dpi = VisualTreeHelper.GetDpi(this);
+            foreach (UIElement child in _canvas.Children)
+            {
+                Canvas.SetLeft(child, Canvas.GetLeft(child) + dx / dpi.DpiScaleX);
+                Canvas.SetTop(child, Canvas.GetTop(child) + dy / dpi.DpiScaleY);
+            }
         }
 
         public void ClearBlocks()
         {
             _canvas.Children.Clear();
-            if (IsVisible)
+            _hasBlocks = false;
+            UpdateVisibility();
+        }
+
+        private void UpdateVisibility()
+        {
+            var visible = _hasBlocks && !_suppressed;
+            if (visible && !IsVisible)
+            {
+                Show();
+            }
+            else if (!visible && IsVisible)
             {
                 Hide();
             }

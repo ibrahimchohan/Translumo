@@ -1,4 +1,6 @@
-﻿using Translumo.Infrastructure;
+﻿using System.Collections.Generic;
+using Translumo.Infrastructure;
+using Translumo.Processing.Overlay;
 
 namespace Translumo.Processing.Interfaces
 {
@@ -12,5 +14,10 @@ namespace Translumo.Processing.Interfaces
 
         // New: send original + translated
         void SendText(string original, string translated);
+
+        /// <summary>
+        /// Replaces the blocks shown by the on-screen overlay. An empty list clears the overlay.
+        /// </summary>
+        void SendOverlayBlocks(IReadOnlyList<OverlayTextBlock> blocks);
     }
 }

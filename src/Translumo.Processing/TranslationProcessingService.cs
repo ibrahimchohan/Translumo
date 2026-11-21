@@ -13,6 +13,7 @@ using Translumo.OCR.Configuration;
 using Translumo.Processing.Configuration;
 using Translumo.Processing.Exceptions;
 using Translumo.Processing.Interfaces;
+using Translumo.Processing.Overlay;
 using Translumo.Processing.TextProcessing;
 using Translumo.Translation;
 using Translumo.Translation.Configuration;
@@ -35,6 +36,7 @@ namespace Translumo.Processing
         private readonly TtsConfiguration _ttsConfiguration;
         private readonly TextDetectionProvider _textProvider;
         private readonly TextResultCacheService _textResultCacheService;
+        private readonly OverlayFrameProcessor _overlayProcessor = new OverlayFrameProcessor();
         private readonly ILogger _logger;
         private readonly object _obj = new object();
         private readonly object _ttsLock = new object();
@@ -53,6 +55,9 @@ namespace Translumo.Processing
         private long _lastTranslatedTextTicks;
 
         private const float MIN_SCORE_THRESHOLD = 2.1f;
+        // Per-block threshold for overlay mode. Lower than MIN_SCORE_THRESHOLD because blocks are shorter than
+        // the whole capture area text. Needs tuning on real content (manga, subtitles, web pages).
+        private const float MIN_OVERLAY_BLOCK_SCORE = 1.0f;
         
         public TranslationProcessingService(ICapturerFactory capturerFactory, IChatTextMediator chatTextMediator, OcrEnginesFactory ocrEnginesFactory,
             TranslatorFactory translationFactory, TtsFactory ttsFactory, TtsConfiguration ttsConfiguration,
@@ -133,6 +138,7 @@ namespace Translumo.Processing
             Guid iterationId;
             IterationType lastIterationType = IterationType.None;
             bool sequentialText = false;
+            bool overlayActive = false;
             int clearTextDelayMs = _textProcessingConfiguration.AutoClearTexts
                 ? (int)_textProcessingConfiguration.AutoClearTextsDelayMs * -1
                 : int.MaxValue * -1;
@@ -200,6 +206,20 @@ namespace Translumo.Processing
                         if (!EnginesEnsureActual())
                         {
                             continue;
+                        }
+
+                        if (_textProcessingConfiguration.OverlayMode)
+                        {
+                            overlayActive = true;
+                            lastIterationType = RunOverlayIteration(appliedEngines, cancellationToken);
+                            continue;
+                        }
+
+                        if (overlayActive)
+                        {
+                            // Overlay mode was switched off during translation
+                            overlayActive = false;
+                            ClearOverlay();
                         }
 
                         if (Interlocked.Read(ref _lastTranslatedTextTicks) < DateTime.UtcNow.AddMilliseconds(clearTextDelayMs).Ticks
@@ -295,12 +315,23 @@ namespace Translumo.Processing
                     _chatTextMediator.SendText($"Text detection is failed ({innerEx.SourceOCREngineType.Name})", false);
                     _logger.LogError(ex, $"Unexpected error during text detection ({innerEx.SourceOCREngineType})");
                 }
+                catch (TextDetectionException ex)
+                {
+                    _chatTextMediator.SendText($"Text detection is failed ({ex.SourceOCREngineType.Name})", false);
+                    _logger.LogError(ex, $"Unexpected error during text detection ({ex.SourceOCREngineType})");
+                }
                 catch (Exception ex)
                 {
                     _chatTextMediator.SendText($"{_translator.GetType().Name} failed: {ex.Message}. Try to change translator, use a proxy or switch VPN location.", false);
                     _logger.LogError(ex, $"Processing iteration failed due to unknown error");
                 }
             }
+
+            if (overlayActive)
+            {
+                ClearOverlay();
+            }
+
             _textResultCacheService.Reset();
             _logger.LogTrace("Translation finished");
         }
@@ -355,6 +386,68 @@ namespace Translumo.Processing
                 _chatTextMediator.SendText($"{_translator.GetType().Name} failed: {ex.Message}. Try to change translator, use a proxy or switch VPN location.", false);
                 _logger.LogError(ex, $"Processing iteration failed due to unknown error");
             }
+        }
+
+        private IterationType RunOverlayIteration(IOCREngine[] engines, CancellationToken cancellationToken)
+        {
+            byte[] screenshot = _capturer.CaptureScreen();
+            OcrTextBlock[] blocks = DetectOverlayBlocks(engines, screenshot);
+            if (blocks == null)
+            {
+                // No engine is ready yet (e.g. EasyOCR is still loading)
+                return IterationType.Short;
+            }
+
+            var validBlocks = blocks
+                .Where(block => _textProvider.GetValidityScore(block.Lines) >= MIN_OVERLAY_BLOCK_SCORE)
+                .ToArray();
+
+            IReadOnlyList<OverlayTextBlock> translated = validBlocks.Length == 0
+                ? Array.Empty<OverlayTextBlock>()
+                : _overlayProcessor.TranslateAsync(validBlocks, _translator, cancellationToken).GetAwaiter().GetResult();
+
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return IterationType.Short;
+            }
+
+            var frame = _overlayProcessor.GetFrameToPublish(translated);
+            if (frame == null)
+            {
+                return IterationType.Short;
+            }
+
+            _chatTextMediator.SendOverlayBlocks(frame);
+            return IterationType.Full;
+        }
+
+        private OcrTextBlock[] DetectOverlayBlocks(IOCREngine[] engines, byte[] screenshot)
+        {
+            // Overlay mode runs a single engine per frame (positions from different engines can't be merged reliably),
+            // so prefer the most accurate one that is ready.
+            foreach (var engine in engines.OrderByDescending(e => e.Confidence))
+            {
+                try
+                {
+                    return engine.GetTextBlocks(screenshot);
+                }
+                catch (InvalidOperationException)
+                {
+                    // Engine is not initialized yet (EasyOCR loads in background); try the next one
+                }
+                catch (Exception ex)
+                {
+                    throw new TextDetectionException("Text detection failed", engine.GetType(), ex);
+                }
+            }
+
+            return null;
+        }
+
+        private void ClearOverlay()
+        {
+            _overlayProcessor.Reset();
+            _chatTextMediator.SendOverlayBlocks(Array.Empty<OverlayTextBlock>());
         }
 
         private async Task TranslateTextAsync(string text, Guid iterationId)
@@ -441,6 +534,7 @@ namespace Translumo.Processing
             }
 
             _translator = _translatorFactory.CreateTranslator(_translationConfiguration);
+            _overlayProcessor.Reset();
         }
 
         private void TtsConfigurationOnPropertyChanged(object sender, PropertyChangedEventArgs e)

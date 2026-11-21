@@ -8,8 +8,21 @@ namespace Translumo.Processing.Configuration
         {
             KeepFormatting = false,
             AutoClearTexts = false,
-            AutoClearTextsDelayMs = 1000
+            AutoClearTextsDelayMs = 1000,
+            OverlayMode = false
         };
+
+        /// <summary>
+        /// Show translations on top of the source text (per text block) instead of in the chat window.
+        /// </summary>
+        public bool OverlayMode
+        {
+            get => _overlayMode;
+            set
+            {
+                SetProperty(ref _overlayMode, value);
+            }
+        }
 
         public bool KeepFormatting
         {
@@ -41,5 +54,6 @@ namespace Translumo.Processing.Configuration
         private bool _keepFormatting;
         private bool _autoClearTexts;
         private uint _autoClearTextsDelayMs = 1000;
+        private bool _overlayMode;
     }
 }

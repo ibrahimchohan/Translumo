@@ -23,6 +23,7 @@ using Translumo.MVVM.Models;
 using Translumo.MVVM.ViewModels;
 using Translumo.OCR;
 using Translumo.OCR.Configuration;
+using Translumo.Overlay;
 using Translumo.Processing;
 using Translumo.Processing.Configuration;
 using Translumo.Processing.Interfaces;
@@ -139,6 +140,7 @@ namespace Translumo
             var chatViewModel = _serviceProvider.GetService<ChatWindowViewModel>();
             var dialogService = _serviceProvider.GetService<DialogService>();
             dialogService.ShowWindowAsync(chatViewModel);
+            _serviceProvider.GetService<OverlayPresenter>();
 
             _serviceProvider.RegisterUIInputController();
         }
@@ -167,6 +169,7 @@ namespace Translumo
             services.AddSingleton<ChatUITextMediator>(chatMediatorInstance);
             services.AddSingleton<Services.AnkiService>();
             services.AddSingleton<ChatWindowViewModel>();
+            services.AddSingleton<OverlayPresenter>();
             services.AddSingleton<ChatWindowModel>();
             services.AddSingleton<HotKeysServiceManager>();
             services.AddSingleton<ScreenCaptureConfiguration>();

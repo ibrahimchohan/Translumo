@@ -45,6 +45,11 @@ namespace Translumo.MVVM.ViewModels
             private set => SetProperty(ref _targetCaption, value);
         }
 
+        /// <summary>Current text size: overlay scale when the overlay is on, otherwise the text window font size.</summary>
+        public string FontSizeCaption => TextProcessing.OverlayMode
+            ? $"{_styleConfiguration.OverlayFontScalePercent}%"
+            : _styleConfiguration.FontSize.ToString();
+
         public bool IsWindowMode => _captureConfiguration.Mode == CaptureTargetMode.Window;
 
         public ICommand ToggleTranslationCommand => new RelayCommand(() =>
@@ -57,10 +62,17 @@ namespace Translumo.MVVM.ViewModels
         public ICommand ToggleChatCommand => new RelayCommand(Chat.ToggleChatVisibility);
         public ICommand OpenSettingsCommand => new RelayCommand(Chat.ToggleSettings);
         public ICommand ToggleCollapseCommand => new RelayCommand(() => IsCollapsed = !IsCollapsed);
+        public ICommand IncreaseFontCommand => new RelayCommand(() => ChangeFontSize(+1));
+        public ICommand DecreaseFontCommand => new RelayCommand(() => ChangeFontSize(-1));
+
+        private const int OVERLAY_FONT_SCALE_STEP = 10;
+        private const int MIN_CHAT_FONT_SIZE = 1;
+        private const int MAX_CHAT_FONT_SIZE = 80;
 
         private readonly TranslationConfiguration _translationConfiguration;
         private readonly ScreenCaptureConfiguration _captureConfiguration;
         private readonly WindowTracker _windowTracker;
+        private readonly ChatWindowConfiguration _styleConfiguration;
         private readonly DispatcherTimer _stateTimer;
         private bool _isRunning;
         private bool _isCollapsed;
@@ -75,7 +87,10 @@ namespace Translumo.MVVM.ViewModels
             _translationConfiguration = translationConfiguration;
             _captureConfiguration = captureConfiguration;
             _windowTracker = windowTracker;
+            _styleConfiguration = chat.Model.Configuration;
 
+            _styleConfiguration.PropertyChanged += (_, _) => OnPropertyChanged(nameof(FontSizeCaption));
+            TextProcessing.PropertyChanged += (_, _) => OnPropertyChanged(nameof(FontSizeCaption));
             _translationConfiguration.PropertyChanged += (_, _) => UpdateLanguagesCaption();
             _captureConfiguration.PropertyChanged += CaptureConfigurationOnPropertyChanged;
             _windowTracker.PropertyChanged += (_, _) => UpdateTargetCaption();
@@ -96,6 +111,18 @@ namespace Translumo.MVVM.ViewModels
             {
                 OnPropertyChanged(nameof(IsWindowMode));
                 UpdateTargetCaption();
+            }
+        }
+
+        private void ChangeFontSize(int direction)
+        {
+            if (TextProcessing.OverlayMode)
+            {
+                _styleConfiguration.OverlayFontScalePercent += direction * OVERLAY_FONT_SCALE_STEP;
+            }
+            else
+            {
+                _styleConfiguration.FontSize = Math.Clamp(_styleConfiguration.FontSize + direction, MIN_CHAT_FONT_SIZE, MAX_CHAT_FONT_SIZE);
             }
         }
 

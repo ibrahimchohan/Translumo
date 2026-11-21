@@ -185,4 +185,8 @@
     <system:String x:Key="Str.Picker.Select">Выбрать</system:String>
     <system:String x:Key="Str.Picker.Browser">Браузер</system:String>
     <system:String x:Key="Str.Picker.PickHint">Щёлкните по окну, чтобы переводить его. Esc — отмена.</system:String>
+    <system:String x:Key="Str.Bar.FontDecrease">Уменьшить текст</system:String>
+    <system:String x:Key="Str.Bar.FontIncrease">Увеличить текст</system:String>
+    <system:String x:Key="Str.Bar.FontSize">Размер текста (наложение: % от размера исходного текста)</system:String>
+    <system:String x:Key="Str.AppearanceSettings.OverlayFontScale">Размер текста наложения, %</system:String>
 </ResourceDictionary>

@@ -186,4 +186,8 @@
     <system:String x:Key="Str.Picker.Select">选择</system:String>
     <system:String x:Key="Str.Picker.Browser">浏览器</system:String>
     <system:String x:Key="Str.Picker.PickHint">单击要翻译的窗口。按 Esc 取消。</system:String>
+    <system:String x:Key="Str.Bar.FontDecrease">缩小文字</system:String>
+    <system:String x:Key="Str.Bar.FontIncrease">放大文字</system:String>
+    <system:String x:Key="Str.Bar.FontSize">文字大小（覆盖：相对原文大小的百分比）</system:String>
+    <system:String x:Key="Str.AppearanceSettings.OverlayFontScale">覆盖文字大小 (%)</system:String>
 </ResourceDictionary>

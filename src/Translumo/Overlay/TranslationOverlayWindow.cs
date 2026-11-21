@@ -26,6 +26,7 @@ namespace Translumo.Overlay
         private const uint WDA_EXCLUDEFROMCAPTURE = 0x11;
 
         private const double MIN_FONT_SIZE = 8;
+        private const double MIN_SCALED_FONT_SIZE = 6;
         private const double BLOCK_PADDING = 2;
         // Font size relative to the source line height (line boxes include ascenders/descenders)
         private const double LINE_HEIGHT_TO_FONT_RATIO = 0.85;
@@ -120,7 +121,7 @@ namespace Translumo.Overlay
             _canvas.Children.Clear();
             foreach (var block in blocks)
             {
-                var element = CreateBlockElement(block, dpi, typeface, background, foreground, style.TextAlignment);
+                var element = CreateBlockElement(block, dpi, typeface, background, foreground, style.TextAlignment, style.OverlayFontScalePercent / 100.0);
                 Canvas.SetLeft(element, block.Bounds.X / dpi.DpiScaleX);
                 Canvas.SetTop(element, block.Bounds.Y / dpi.DpiScaleY);
                 _canvas.Children.Add(element);
@@ -164,14 +165,17 @@ namespace Translumo.Overlay
         }
 
         private FrameworkElement CreateBlockElement(OverlayTextBlock block, DpiScale dpi, Typeface typeface, Brush background,
-            Brush foreground, TextAlignment alignment)
+            Brush foreground, TextAlignment alignment, double fontScale)
         {
             var width = block.Bounds.Width / dpi.DpiScaleX;
             var height = block.Bounds.Height / dpi.DpiScaleY;
-            var maxFontSize = Math.Max(MIN_FONT_SIZE, block.LineHeight / dpi.DpiScaleY * LINE_HEIGHT_TO_FONT_RATIO);
+            // User scale applies to both the preferred size (source text size) and the smallest allowed size;
+            // above 100% the box grows downwards when the text no longer fits
+            var minFontSize = Math.Max(MIN_SCALED_FONT_SIZE, MIN_FONT_SIZE * fontScale);
+            var maxFontSize = Math.Max(minFontSize, block.LineHeight / dpi.DpiScaleY * LINE_HEIGHT_TO_FONT_RATIO * fontScale);
             var innerWidth = Math.Max(1, width - BLOCK_PADDING * 2);
             var innerHeight = Math.Max(1, height - BLOCK_PADDING * 2);
-            var fontSize = FitFontSize(block.Translation, innerWidth, innerHeight, maxFontSize, typeface, dpi.PixelsPerDip);
+            var fontSize = FitFontSize(block.Translation, innerWidth, innerHeight, minFontSize, maxFontSize, typeface, dpi.PixelsPerDip);
 
             var text = new TextBlock
             {
@@ -201,7 +205,7 @@ namespace Translumo.Overlay
         /// <summary>
         /// Largest font size (up to the source text size) at which the text fits the box.
         /// </summary>
-        private static double FitFontSize(string text, double width, double height, double maxFontSize, Typeface typeface, double pixelsPerDip)
+        private static double FitFontSize(string text, double width, double height, double minFontSize, double maxFontSize, Typeface typeface, double pixelsPerDip)
         {
             bool Fits(double size)
             {
@@ -219,7 +223,7 @@ namespace Translumo.Overlay
                 return maxFontSize;
             }
 
-            double low = MIN_FONT_SIZE, high = maxFontSize;
+            double low = minFontSize, high = maxFontSize;
             for (var i = 0; i < FIT_ITERATIONS && high - low > 0.5; i++)
             {
                 var mid = (low + high) / 2;
